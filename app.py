@@ -248,13 +248,106 @@ STYLES = '''
     body[data-theme='lightblue'] .container { background: rgba(240,250,255,0.95); }
     body[data-theme='lightblue'] .btn-secondary { background: #e1f5fe; color: #01579b; }
 
+    /* ===== НАЧАЛО МОБИЛЬНОЙ АДАПТАЦИИ ===== */
     @media (max-width: 800px) {
         .admin-dashboard { flex-direction: column; }
-        .header { flex-direction: column; gap: 10px; }
-        .header .user-info { flex-wrap: wrap; justify-content: center; }
+        .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .header .user-info { width: 100%; justify-content: space-between; flex-wrap: wrap; }
         .profile-layout { flex-direction: column; }
-        .profile-sidebar { flex: 1; width: 100%; }
+        .profile-sidebar { width: 100%; }
+
+        /* Таблица пользователей – горизонтальная прокрутка */
+        .user-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        .user-table th, .user-table td {
+            min-width: 120px;
+        }
+
+        /* Кнопки – крупнее для нажатия пальцем */
+        .btn {
+            padding: 12px 18px;
+            font-size: 1em;
+            display: inline-block;
+        }
+        .btn-sm {
+            padding: 10px 14px;
+            font-size: 0.95em;
+        }
+
+        /* Элементы списка файлов – компактнее, но с большими зонами нажатия */
+        .file-item {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding: 15px;
+        }
+        .file-actions {
+            margin-left: 0;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .file-actions .btn {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Шапка – вертикальное расположение на маленьких экранах */
+        .settings-gear {
+            font-size: 2em;  /* крупнее значок */
+        }
+        .settings-menu {
+            position: fixed;
+            right: 10px;
+            top: 60px;
+            min-width: 160px;
+        }
+
+        /* Формы – поля на всю ширину */
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"],
+        .form-group input[type="file"] {
+            padding: 15px;
+            font-size: 16px;  /* чтобы не zoom’ился на iOS */
+        }
+
+        /* Профиль – колонки становятся одной */
+        .theme-option {
+            padding: 14px;
+        }
+
+        /* Редактор аватара – адаптация */
+        .avatar-preview-container {
+            width: 120px;
+            height: 120px;
+        }
+        .avatar-controls button {
+            width: 44px;
+            height: 44px;
+            font-size: 1.5em;
+        }
+
+        /* Кнопка закрытия профиля – больше */
+        .profile-close-btn {
+            font-size: 2.5em;
+            top: 10px;
+            right: 15px;
+        }
+
+        /* Аватар в шапке – крупнее */
+        .avatar {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5em;
+        }
     }
+    /* ===== КОНЕЦ МОБИЛЬНОЙ АДАПТАЦИИ ===== */
+
     /* Новые стили для профиля и редактора аватара */
     .profile-close-btn { position: absolute; top: 20px; right: 20px; font-size: 2em; color: #2d5a48; background: none; border: none; cursor: pointer; }
     .avatar-editor { display: none; margin-top: 15px; background: #f0f8f4; padding: 20px; border-radius: 10px; border: 1px solid #cde5db; }
@@ -411,7 +504,8 @@ def render_with_bubbles(template, **kwargs):
     '''
     body_start = f'<body data-theme="{theme}">'
     body_end = '</body>'
-    full_template = body_start + bubbles_html + template + body_end
+    head = '<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>'
+    full_template = head + body_start + bubbles_html + template + body_end
     return render_template_string(STYLES + full_template, **kwargs, theme=theme, avatar_url=avatar_url)
 
 def send_reset_email(to_email: str, reset_url: str) -> bool:
@@ -1193,7 +1287,7 @@ def profile():
                 updateTransform();
             });
 
-            // Перетаскивание
+            // Перетаскивание мышью
             avatarPreviewContainer.addEventListener('mousedown', function(e) {
                 isDragging = true;
                 startX = e.clientX - offsetX;
@@ -1207,6 +1301,30 @@ def profile():
                 updateTransform();
             });
             document.addEventListener('mouseup', function() {
+                isDragging = false;
+                avatarPreviewContainer.style.cursor = 'grab';
+            });
+
+            // Перетаскивание пальцем (touch)
+            avatarPreviewContainer.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                isDragging = true;
+                startX = touch.clientX - offsetX;
+                startY = touch.clientY - offsetY;
+                avatarPreviewContainer.style.cursor = 'grabbing';
+            }, { passive: false });
+
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                offsetX = touch.clientX - startX;
+                offsetY = touch.clientY - startY;
+                updateTransform();
+            }, { passive: false });
+
+            document.addEventListener('touchend', function() {
                 isDragging = false;
                 avatarPreviewContainer.style.cursor = 'grab';
             });
