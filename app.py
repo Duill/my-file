@@ -486,7 +486,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        email = request.form['email']
+        email = request.form.get('email', '').strip()  # email необязателен
         role = 'user'
         theme = 'green'
         if not is_valid_username(username) or not is_valid_password(password):
@@ -499,12 +499,13 @@ def register():
                     </div>
                 </div>
             ''')
-        if not is_valid_email(email):
+        # Валидация email только если он введён
+        if email and not is_valid_email(email):
             return render_with_bubbles('''
                 <div class="container">
                     <div class="error-box">
                         <h2>Ошибка</h2>
-                        <p>Введите корректный email.</p>
+                        <p>Введите корректный email или оставьте поле пустым.</p>
                         <a href="/register" class="btn btn-primary">Назад</a>
                     </div>
                 </div>
@@ -521,19 +522,22 @@ def register():
                         </div>
                     </div>
                 ''')
-            email_exists = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-            if email_exists:
-                return render_with_bubbles('''
-                    <div class="container">
-                        <div class="error-box">
-                            <h2>Ошибка</h2>
-                            <p>Email уже используется.</p>
-                            <a href="/register" class="btn btn-primary">Назад</a>
+            # Проверка уникальности email только если он указан
+            if email:
+                email_exists = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+                if email_exists:
+                    return render_with_bubbles('''
+                        <div class="container">
+                            <div class="error-box">
+                                <h2>Ошибка</h2>
+                                <p>Email уже используется.</p>
+                                <a href="/register" class="btn btn-primary">Назад</a>
+                            </div>
                         </div>
-                    </div>
-                ''')
+                    ''')
+            email_value = email if email else None
             cursor = db.execute('INSERT INTO users (username, password, email, role, theme) VALUES (?, ?, ?, ?, ?)',
-                               (username, password, email, role, theme))
+                               (username, password, email_value, role, theme))
             db.commit()
             user_id = cursor.lastrowid
         session['user_id'] = user_id
@@ -551,8 +555,9 @@ def register():
                         <input type="text" name="username" required minlength="6">
                     </div>
                     <div class="form-group">
-                        <label>Эл. почта:</label>
-                        <input type="email" name="email" required>
+                        <label>Эл. почта (необязательно):</label>
+                        <input type="email" name="email">
+                        <small style="display:block; margin-top:5px; color:#666;">Укажите почту, если хотите иметь возможность восстановить пароль.</small>
                     </div>
                     <div class="form-group">
                         <label>Пароль:</label>
@@ -961,14 +966,22 @@ def profile():
     
     if request.method == 'POST':
         new_username = request.form['username'].strip()
+        new_email = request.form.get('email', '').strip()
         new_theme = request.form.get('theme', 'green')
         if new_theme not in ['green', 'grey', 'red', 'orange', 'pink', 'blue', 'lightblue']:
             new_theme = 'green'
         if not is_valid_username(new_username):
             return jsonify({'status': 'error', 'message': 'Логин слишком короткий'}), 400
+        if new_email and not is_valid_email(new_email):
+            return jsonify({'status': 'error', 'message': 'Некорректный email'}), 400
         with get_db() as db:
-            db.execute('UPDATE users SET username=?, theme=? WHERE id=?',
-                       (new_username, new_theme, user_id))
+            if new_email:
+                existing = db.execute('SELECT id FROM users WHERE email = ? AND id != ?', (new_email, user_id)).fetchone()
+                if existing:
+                    return jsonify({'status': 'error', 'message': 'Этот email уже используется'}), 400
+            email_value = new_email if new_email else None
+            db.execute('UPDATE users SET username=?, email=?, theme=? WHERE id=?',
+                       (new_username, email_value, new_theme, user_id))
             db.commit()
         session['username'] = new_username
         return jsonify({'status': 'ok'})
@@ -1000,6 +1013,11 @@ def profile():
                         <div class="form-group">
                             <label>Никнейм:</label>
                             <input type="text" name="username" id="username-input" value="{{ user.username }}" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label>Эл. почта (необязательно):</label>
+                            <input type="email" name="email" id="email-input" value="{{ user.email or '' }}">
+                            <small style="display:block; margin-top:5px; color:#666;">Почта нужна для восстановления пароля. Без неё восстановить доступ будет невозможно.</small>
                         </div>
                     </form>
                     <!-- Форма для аватара -->
@@ -1040,7 +1058,7 @@ def profile():
             </div>
         </div>
         <script>
-            // ===== Мгновенное сохранение темы и ника =====
+            // ===== Мгновенное сохранение темы и ника (и email) =====
             function setTheme(theme) {
                 document.body.dataset.theme = theme;
                 // Сохраняем тему
@@ -1049,6 +1067,7 @@ def profile():
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({
                         username: document.getElementById('username-input').value,
+                        email: document.getElementById('email-input').value,
                         theme: theme
                     })
                 }).then(r => r.json()).then(data => {
@@ -1066,7 +1085,7 @@ def profile():
                 }
             }
 
-            // Автосохранение ника при потере фокуса или Enter
+            // Автосохранение ника и email при потере фокуса или Enter
             document.getElementById('username-input').addEventListener('change', function() {
                 saveUsernameAndTheme();
             });
@@ -1076,15 +1095,26 @@ def profile():
                     this.blur();
                 }
             });
+            document.getElementById('email-input').addEventListener('change', function() {
+                saveUsernameAndTheme();
+            });
+            document.getElementById('email-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
+                }
+            });
 
             function saveUsernameAndTheme() {
                 var username = document.getElementById('username-input').value;
+                var email = document.getElementById('email-input').value;
                 var theme = document.querySelector('input[name="theme"]:checked').value;
                 fetch('/profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: new URLSearchParams({
                         username: username,
+                        email: email,
                         theme: theme
                     })
                 }).then(r => r.json()).then(data => {
@@ -1426,21 +1456,21 @@ def edit_user(user_id):
             return "Пользователь не найден", 404
         if request.method == 'POST':
             new_username = request.form['username'].strip()
-            new_email = request.form['email'].strip()
+            new_email = request.form.get('email', '').strip()
             new_role = request.form['role']
             new_password = request.form['password'].strip()
             if not is_valid_username(new_username):
                 return "Логин слишком короткий", 400
-            if not is_valid_email(new_email):
+            if new_email and not is_valid_email(new_email):
                 return "Некорректный email", 400
             if new_password:
                 if not is_valid_password(new_password):
                     return "Пароль не соответствует требованиям", 400
                 db.execute('UPDATE users SET username=?, password=?, email=?, role=? WHERE id=?',
-                           (new_username, new_password, new_email, new_role, user_id))
+                           (new_username, new_password, new_email if new_email else None, new_role, user_id))
             else:
                 db.execute('UPDATE users SET username=?, email=?, role=? WHERE id=?',
-                           (new_username, new_email, new_role, user_id))
+                           (new_username, new_email if new_email else None, new_role, user_id))
             db.commit()
             return redirect(url_for('admin_users'))
     return render_with_bubbles('''
@@ -1449,7 +1479,7 @@ def edit_user(user_id):
                 <h2>Редактирование участника</h2>
                 <form method="post">
                     <div class="form-group"><label>Логин:</label><input type="text" name="username" value="{{ user.username }}" required></div>
-                    <div class="form-group"><label>Эл. почта:</label><input type="email" name="email" value="{{ user.email or '' }}" required></div>
+                    <div class="form-group"><label>Эл. почта (необязательно):</label><input type="email" name="email" value="{{ user.email or '' }}"></div>
                     <div class="form-group"><label>Новый пароль (оставьте пустым, чтобы не менять):</label><input type="password" name="password"></div>
                     <div class="form-group"><label>Роль:</label><select name="role">
                         <option value="user" {% if user.role == 'user' %}selected{% endif %}>Пользователь</option>
