@@ -1010,11 +1010,12 @@ def dashboard():
     role = session['role']
     user_id = session['user_id']
     with get_db() as db:
-        user = db.execute('SELECT avatar_scale, avatar_offset_x, avatar_offset_y, public_id FROM users WHERE id = ?', (user_id,)).fetchone()
+        user = db.execute('SELECT avatar_scale, avatar_offset_x, avatar_offset_y, public_id, email FROM users WHERE id = ?', (user_id,)).fetchone()
         avatar_scale = user['avatar_scale'] if user and 'avatar_scale' in user.keys() else 1.0
         avatar_offset_x = user['avatar_offset_x'] if user and 'avatar_offset_x' in user.keys() else 0.0
         avatar_offset_y = user['avatar_offset_y'] if user and 'avatar_offset_y' in user.keys() else 0.0
         public_id = user['public_id'] if user else ''
+        email = user['email'] if user else None
 
         pending_count = db.execute('SELECT COUNT(*) as cnt FROM chat_requests WHERE receiver_id = ? AND status = "pending"', (user_id,)).fetchone()['cnt']
 
@@ -1055,6 +1056,12 @@ def dashboard():
                         <a href="/logout" class="btn btn-secondary btn-sm">Выйти</a>
                     </div>
                 </div>
+                {% if not email %}
+                <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px;">
+                    ⚠️ Вы не указали электронную почту. Без неё вы не сможете восстановить пароль. 
+                    <a href="/profile" class="btn btn-warning btn-sm" style="margin-left: 10px; background: #ffc107; color: #333;">Добавить сейчас</a>
+                </div>
+                {% endif %}
                 {% if public_files %}
                 <div class="file-list">
                     {% for file in public_files %}
@@ -1099,6 +1106,12 @@ def dashboard():
                         <a href="/logout" class="btn btn-secondary btn-sm">Выйти</a>
                     </div>
                 </div>
+                {% if not email %}
+                <div style="background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px;">
+                    ⚠️ Вы не указали электронную почту. Без неё вы не сможете восстановить пароль. 
+                    <a href="/profile" class="btn btn-warning btn-sm" style="margin-left: 10px; background: #ffc107; color: #333;">Добавить сейчас</a>
+                </div>
+                {% endif %}
                 <div class="admin-dashboard">
                     <div class="panel">
                         <div class="panel-title">
@@ -1289,7 +1302,7 @@ def dashboard():
     return render_with_bubbles(full_template, public_files=public_files, private_files=private_files,
                                username=username, role=role, avatar_scale=avatar_scale,
                                avatar_offset_x=avatar_offset_x, avatar_offset_y=avatar_offset_y,
-                               public_id=public_id, pending_count=pending_count)
+                               public_id=public_id, pending_count=pending_count, email=email)
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
