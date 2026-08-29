@@ -140,6 +140,10 @@ STYLES = '''
         width: 100%; padding: 12px 15px; border: 1px solid #cde5db; border-radius: 8px; font-size: 1em; transition: border-color 0.2s, box-shadow 0.2s; background: #fafffd;
     }
     .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(143,206,176,0.25); }
+    /* Скрываем мигающий курсор (каретку), когда мышь не над полем ввода */
+    input:not(:hover), textarea:not(:hover) {
+        caret-color: transparent;
+    }
     .toggle-password { position: absolute; right: 12px; top: 38px; cursor: pointer; user-select: none; font-size: 1.2em; color: #777; transition: color 0.2s; }
     .toggle-password:hover { color: #333; }
     .admin-dashboard { display: flex; gap: 25px; flex-wrap: wrap; }
