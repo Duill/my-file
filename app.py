@@ -120,10 +120,7 @@ STYLES = '''
         width: 100%; padding: 12px 15px; border: 1px solid #cde5db; border-radius: 8px; font-size: 1em; transition: border-color 0.2s, box-shadow 0.2s; background: #fafffd;
     }
     .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(143,206,176,0.25); }
-    /* Скрываем мигающий курсор (каретку), когда мышь не над полем ввода */
-    input:not(:hover), textarea:not(:hover) {
-        caret-color: transparent;
-    }
+    input:not(:hover), textarea:not(:hover) { caret-color: transparent; }
     .toggle-password { position: absolute; right: 12px; top: 38px; cursor: pointer; user-select: none; font-size: 1.2em; color: #777; transition: color 0.2s; }
     .toggle-password:hover { color: #333; }
     .admin-dashboard { display: flex; gap: 25px; flex-wrap: wrap; }
@@ -248,6 +245,10 @@ STYLES = '''
     .msg-input { display: flex; gap: 5px; }
     .msg-input input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
     .msg-input button { padding: 8px 12px; }
+
+    /* Новая вкладка «Заявки» */
+    .requests-container { max-width: 600px; margin: 0 auto; }
+    .request-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: white; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
     @media (max-width: 800px) {
         .chat-layout { flex-direction: column; }
@@ -383,7 +384,6 @@ def init_db():
             db.execute('ALTER TABLE users ADD COLUMN avatar_offset_y REAL DEFAULT 0.0')
         if 'public_id' not in columns:
             db.execute('ALTER TABLE users ADD COLUMN public_id TEXT')
-            # Заполняем для существующих
             users = db.execute('SELECT id FROM users').fetchall()
             for user in users:
                 pub_id = uuid.uuid4().hex[:8].upper()
@@ -827,7 +827,6 @@ def search_user_by_public_id():
             return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
         if user['id'] == session['user_id']:
             return jsonify({'status': 'error', 'message': 'Это вы'}), 400
-        # Проверяем, есть ли уже заявка или дружба
         existing = db.execute('''
             SELECT * FROM chat_requests 
             WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
@@ -851,7 +850,6 @@ def send_friend_request():
         receiver = db.execute('SELECT id FROM users WHERE id = ?', (receiver_id,)).fetchone()
         if not receiver:
             return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
-        # Проверка дубликатов
         existing = db.execute('''
             SELECT * FROM chat_requests 
             WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
@@ -862,7 +860,6 @@ def send_friend_request():
             elif existing['status'] == 'accepted':
                 return jsonify({'status': 'error', 'message': 'Вы уже друзья'}), 400
             elif existing['status'] == 'declined':
-                # Можно разрешить повторную отправку после decline, обновив существующую
                 db.execute('UPDATE chat_requests SET status = "pending", created_at = CURRENT_TIMESTAMP WHERE id = ?', (existing['id'],))
                 db.commit()
                 return jsonify({'status': 'ok', 'message': 'Заявка отправлена повторно'})
@@ -876,7 +873,7 @@ def send_friend_request():
 @login_required
 def handle_friend_request():
     request_id = request.form.get('request_id', type=int)
-    action = request.form.get('action')  # 'accept' или 'decline'
+    action = request.form.get('action')
     if action not in ['accept', 'decline']:
         return jsonify({'status': 'error', 'message': 'Неверное действие'}), 400
     with get_db() as db:
@@ -924,7 +921,6 @@ def send_message():
     text = request.form.get('text', '').strip()
     if not receiver_id or not text:
         return jsonify({'status': 'error', 'message': 'Нет данных'}), 400
-    # Проверяем, что есть accepted заявка
     with get_db() as db:
         friendship = db.execute('''
             SELECT * FROM chat_requests
@@ -943,7 +939,6 @@ def send_message():
 @login_required
 def get_messages(other_user_id):
     with get_db() as db:
-        # Проверяем дружбу
         friendship = db.execute('''
             SELECT * FROM chat_requests
             WHERE status = 'accepted' AND (
@@ -958,6 +953,53 @@ def get_messages(other_user_id):
             ORDER BY created_at ASC
         ''', (session['user_id'], other_user_id, other_user_id, session['user_id'])).fetchall()
     return jsonify({'status': 'ok', 'messages': [dict(m) for m in messages]})
+
+# Страница со всеми входящими заявками
+@app.route('/requests')
+@login_required
+def requests_page():
+    with get_db() as db:
+        requests = db.execute('''
+            SELECT chat_requests.id, users.username, users.public_id
+            FROM chat_requests
+            JOIN users ON chat_requests.sender_id = users.id
+            WHERE chat_requests.receiver_id = ? AND chat_requests.status = 'pending'
+        ''', (session['user_id'],)).fetchall()
+    return render_with_bubbles('''
+        <div class="container requests-container">
+            <h2>Входящие заявки</h2>
+            {% if requests %}
+                {% for req in requests %}
+                <div class="request-card">
+                    <div>
+                        <strong>{{ req.username }}</strong> (ID: {{ req.public_id }})
+                    </div>
+                    <div class="request-actions">
+                        <button class="btn btn-success btn-sm" onclick="handleRequest({{ req.id }}, 'accept')">Принять</button>
+                        <button class="btn btn-danger btn-sm" onclick="handleRequest({{ req.id }}, 'decline')">Отклонить</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Нет входящих заявок.</p>
+            {% endif %}
+            <a href="/dashboard" class="btn btn-secondary">Назад</a>
+        </div>
+        <script>
+            async function handleRequest(requestId, action) {
+                const formData = new FormData();
+                formData.append('request_id', requestId);
+                formData.append('action', action);
+                const resp = await fetch('/handle_friend_request', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            }
+        </script>
+    ''', requests=requests)
 
 # ===== КОНЕЦ ЧАТ МАРШРУТОВ =====
 
@@ -974,6 +1016,8 @@ def dashboard():
         avatar_offset_y = user['avatar_offset_y'] if user and 'avatar_offset_y' in user.keys() else 0.0
         public_id = user['public_id'] if user else ''
 
+        pending_count = db.execute('SELECT COUNT(*) as cnt FROM chat_requests WHERE receiver_id = ? AND status = "pending"', (user_id,)).fetchone()['cnt']
+
         public_files = db.execute('''
             SELECT files.*, users.username 
             FROM files JOIN users ON files.user_id = users.id 
@@ -987,7 +1031,6 @@ def dashboard():
                 WHERE files.is_public = 0 ORDER BY files.uploaded_at DESC
             ''').fetchall()
     
-    # Подготовка данных для чата (друзья, заявки) - можно через JS, но здесь передадим начальные
     if role != 'admin':
         main_content = '''
             <div class="container">
@@ -1004,6 +1047,7 @@ def dashboard():
                             {% endif %}
                         </a>
                         <span class="role-badge">Пользователь: {{ username }}</span>
+                        <a href="/requests" class="btn btn-primary btn-sm">Заявки ({{ pending_count }})</a>
                         <button class="settings-gear" onclick="toggleSettingsMenu()">⚙️</button>
                         <div class="settings-menu" id="settingsMenu">
                             <a href="/profile">Профиль</a>
@@ -1046,6 +1090,7 @@ def dashboard():
                             {% endif %}
                         </a>
                         <span class="role-badge">Администратор: {{ username }}</span>
+                        <a href="/requests" class="btn btn-primary btn-sm">Заявки ({{ pending_count }})</a>
                         <button class="settings-gear" onclick="toggleSettingsMenu()">⚙️</button>
                         <div class="settings-menu" id="settingsMenu">
                             <a href="/profile">Профиль</a>
@@ -1110,10 +1155,6 @@ def dashboard():
             <div id="search-result"></div>
             <div class="chat-sections">
                 <div class="chat-section">
-                    <h4>Заявки <span id="pending-count" style="color: red;"></span></h4>
-                    <div id="pending-requests"></div>
-                </div>
-                <div class="chat-section">
                     <h4>Друзья</h4>
                     <div id="friends-list"></div>
                 </div>
@@ -1177,44 +1218,6 @@ def dashboard():
                 alert(data.message);
                 document.getElementById('search-result').innerHTML = '';
                 document.getElementById('chat-public-id-input').value = '';
-                loadPendingRequests();
-            }
-
-            async function loadPendingRequests() {
-                const resp = await fetch('/get_pending_requests');
-                const data = await resp.json();
-                const container = document.getElementById('pending-requests');
-                container.innerHTML = '';
-                if (data.requests.length === 0) {
-                    container.innerHTML = '<p>Нет заявок</p>';
-                }
-                data.requests.forEach(req => {
-                    const div = document.createElement('div');
-                    div.className = 'chat-item';
-                    div.innerHTML = `
-                        <span class="username">${req.username} (ID: ${req.public_id})</span>
-                        <div class="request-actions">
-                            <button class="btn btn-success btn-sm" onclick="handleRequest(${req.id}, 'accept')">✓</button>
-                            <button class="btn btn-danger btn-sm" onclick="handleRequest(${req.id}, 'decline')">✗</button>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-                document.getElementById('pending-count').textContent = data.requests.length > 0 ? `(${data.requests.length})` : '';
-            }
-
-            async function handleRequest(requestId, action) {
-                const formData = new FormData();
-                formData.append('request_id', requestId);
-                formData.append('action', action);
-                const resp = await fetch('/handle_friend_request', { method: 'POST', body: formData });
-                const data = await resp.json();
-                if (data.status === 'ok') {
-                    loadPendingRequests();
-                    loadFriends();
-                } else {
-                    alert(data.message);
-                }
             }
 
             async function loadFriends() {
@@ -1276,12 +1279,8 @@ def dashboard():
                 }
             }
 
-            // Инициализация
-            loadPendingRequests();
             loadFriends();
-            // Периодическое обновление заявок и сообщений
             setInterval(() => {
-                loadPendingRequests();
                 if (currentChatUserId) loadMessages();
             }, 5000);
         </script>
@@ -1290,7 +1289,7 @@ def dashboard():
     return render_with_bubbles(full_template, public_files=public_files, private_files=private_files,
                                username=username, role=role, avatar_scale=avatar_scale,
                                avatar_offset_x=avatar_offset_x, avatar_offset_y=avatar_offset_y,
-                               public_id=public_id)
+                               public_id=public_id, pending_count=pending_count)
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -1876,7 +1875,6 @@ def delete_user(user_id):
                 except:
                     pass
         db.execute('DELETE FROM files WHERE user_id = ?', (user_id,))
-        # Удаляем сообщения и заявки, связанные с пользователем
         db.execute('DELETE FROM messages WHERE sender_id = ? OR receiver_id = ?', (user_id, user_id))
         db.execute('DELETE FROM chat_requests WHERE sender_id = ? OR receiver_id = ?', (user_id, user_id))
         db.execute('DELETE FROM users WHERE id = ?', (user_id,))
