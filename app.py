@@ -82,7 +82,7 @@ STYLES = '''
     .bubble:nth-child(7) { width: 70px; height: 70px; left: 90%; animation-duration: 14s; animation-delay: 2s; }
     .bubble:nth-child(8) { width: 100px; height: 100px; left: 45%; animation-duration: 17s; animation-delay: 5s; }
     .container {
-        max-width: 1200px; margin: 0 auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+        max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
         border-radius: 12px; padding: 25px 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         position: relative; z-index: 1; animation: fadeIn 0.4s ease-out;
     }
@@ -92,31 +92,11 @@ STYLES = '''
     .header .user-info { display: flex; align-items: center; gap: 15px; }
     .role-badge { background: var(--primary); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; }
     .avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid var(--primary);
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--primary);
-        color: white;
-        font-weight: bold;
-        font-size: 1.2em;
-        position: relative;
+        width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--primary);
+        cursor: pointer; display: inline-flex; align-items: center; justify-content: center; background: var(--primary);
+        color: white; font-weight: bold; font-size: 1.2em; position: relative;
     }
-    .avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        display: block;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform-origin: center center;
-    }
+    .avatar img { width: 100%; height: 100%; object-fit: contain; display: block; position: absolute; top: 50%; left: 50%; transform-origin: center center; }
     .settings-gear { position: relative; cursor: pointer; font-size: 1.5em; background: none; border: none; color: #4a7a6b; transition: transform 0.3s ease; }
     .settings-gear:hover { transform: rotate(90deg); }
     .settings-menu { display: none; position: absolute; right: 0; top: 40px; background: white; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.12); min-width: 180px; z-index: 1000; padding: 8px 0; animation: slideDown 0.2s ease-out; border: 1px solid #eee; }
@@ -176,26 +156,8 @@ STYLES = '''
     .profile-layout { display: flex; gap: 30px; align-items: flex-start; }
     .profile-sidebar { flex: 0 0 220px; }
     .profile-main { flex: 1; min-width: 0; }
-    .profile-avatar-upload { 
-        position: relative; 
-        width: 80px; 
-        height: 80px; 
-        margin-bottom: 15px; 
-        cursor: pointer; 
-        overflow: hidden; 
-        border-radius: 50%;
-        background: #f0f0f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .profile-avatar-upload img { 
-        width: 100%; 
-        height: 100%; 
-        object-fit: contain;
-        transform-origin: center center;
-        transition: transform 0.2s; 
-    }
+    .profile-avatar-upload { position: relative; width: 80px; height: 80px; margin-bottom: 15px; cursor: pointer; overflow: hidden; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; }
+    .profile-avatar-upload img { width: 100%; height: 100%; object-fit: contain; transform-origin: center center; transition: transform 0.2s; }
     .profile-avatar-upload input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; top: 0; left: 0; }
     .avatar-scale-control { margin-top: 10px; }
     body[data-theme='grey'] {
@@ -252,132 +214,73 @@ STYLES = '''
     body[data-theme='lightblue'] .container { background: rgba(240,250,255,0.95); }
     body[data-theme='lightblue'] .btn-secondary { background: #e1f5fe; color: #01579b; }
 
-    /* ===== НАЧАЛО МОБИЛЬНОЙ АДАПТАЦИИ ===== */
+    /* ===== ЧАТ ===== */
+    .chat-layout {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+    .chat-sidebar {
+        width: 320px;
+        flex-shrink: 0;
+        background: rgba(255,255,255,0.9);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        padding: 15px;
+        border: 1px solid rgba(143,206,176,0.3);
+    }
+    .chat-sidebar h3 { color: #2d5a48; margin-bottom: 15px; }
+    .chat-search { display: flex; gap: 8px; margin-bottom: 20px; }
+    .chat-search input { flex: 1; padding: 10px; border: 1px solid #cde5db; border-radius: 8px; }
+    .chat-sections { display: flex; flex-direction: column; gap: 15px; }
+    .chat-section { background: #f9fcfb; border-radius: 8px; padding: 10px; }
+    .chat-section h4 { font-size: 0.95em; color: #2d5a48; margin-bottom: 8px; }
+    .chat-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+    .chat-item:hover { background: #eef5f1; }
+    .chat-item .username { font-weight: 500; }
+    .request-actions { display: flex; gap: 5px; }
+    .chat-window { display: none; margin-top: 10px; background: white; border-radius: 8px; padding: 10px; }
+    .chat-window.active { display: block; }
+    .messages { max-height: 250px; overflow-y: auto; margin-bottom: 10px; }
+    .msg { margin-bottom: 8px; padding: 8px; border-radius: 8px; }
+    .msg.sent { background: #e0f0e9; text-align: right; }
+    .msg.received { background: #f0f0f0; }
+    .msg-input { display: flex; gap: 5px; }
+    .msg-input input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+    .msg-input button { padding: 8px 12px; }
+
     @media (max-width: 800px) {
+        .chat-layout { flex-direction: column; }
+        .chat-sidebar { width: 100%; }
         .admin-dashboard { flex-direction: column; }
         .header { flex-direction: column; align-items: flex-start; gap: 10px; }
         .header .user-info { width: 100%; justify-content: space-between; flex-wrap: wrap; }
         .profile-layout { flex-direction: column; }
         .profile-sidebar { width: 100%; }
 
-        /* Таблица пользователей – горизонтальная прокрутка */
-        .user-table {
-            display: block;
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-        .user-table th, .user-table td {
-            min-width: 120px;
-        }
-
-        /* Кнопки – крупнее для нажатия пальцем */
-        .btn {
-            padding: 12px 18px;
-            font-size: 1em;
-            display: inline-block;
-        }
-        .btn-sm {
-            padding: 10px 14px;
-            font-size: 0.95em;
-        }
-
-        /* Элементы списка файлов – компактнее, но с большими зонами нажатия */
-        .file-item {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
-            padding: 15px;
-        }
-        .file-actions {
-            margin-left: 0;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .file-actions .btn {
-            flex: 1;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        /* Шапка – вертикальное расположение на маленьких экранах */
-        .settings-gear {
-            font-size: 2em;  /* крупнее значок */
-        }
-        .settings-menu {
-            position: fixed;
-            right: 10px;
-            top: 60px;
-            min-width: 160px;
-        }
-
-        /* Формы – поля на всю ширину */
-        .form-group input[type="text"],
-        .form-group input[type="password"],
-        .form-group input[type="email"],
-        .form-group input[type="file"] {
-            padding: 15px;
-            font-size: 16px;  /* чтобы не zoom’ился на iOS */
-        }
-
-        /* Профиль – колонки становятся одной */
-        .theme-option {
-            padding: 14px;
-        }
-
-        /* Редактор аватара – адаптация */
-        .avatar-preview-container {
-            width: 120px;
-            height: 120px;
-        }
-        .avatar-controls button {
-            width: 44px;
-            height: 44px;
-            font-size: 1.5em;
-        }
-
-        /* Кнопка закрытия профиля – больше */
-        .profile-close-btn {
-            font-size: 2.5em;
-            top: 10px;
-            right: 15px;
-        }
-
-        /* Аватар в шапке – крупнее */
-        .avatar {
-            width: 50px;
-            height: 50px;
-            font-size: 1.5em;
-        }
+        .user-table { display: block; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+        .user-table th, .user-table td { min-width: 120px; }
+        .btn { padding: 12px 18px; font-size: 1em; display: inline-block; }
+        .btn-sm { padding: 10px 14px; font-size: 0.95em; }
+        .file-item { flex-direction: column; align-items: stretch; gap: 10px; padding: 15px; }
+        .file-actions { margin-left: 0; gap: 10px; flex-wrap: wrap; }
+        .file-actions .btn { flex: 1; min-width: 80px; text-align: center; }
+        .settings-gear { font-size: 2em; }
+        .settings-menu { position: fixed; right: 10px; top: 60px; min-width: 160px; }
+        .form-group input[type="text"], .form-group input[type="password"], .form-group input[type="email"], .form-group input[type="file"] { padding: 15px; font-size: 16px; }
+        .theme-option { padding: 14px; }
+        .avatar-preview-container { width: 120px; height: 120px; }
+        .avatar-controls button { width: 44px; height: 44px; font-size: 1.5em; }
+        .profile-close-btn { font-size: 2.5em; top: 10px; right: 15px; }
+        .avatar { width: 50px; height: 50px; font-size: 1.5em; }
     }
-    /* ===== КОНЕЦ МОБИЛЬНОЙ АДАПТАЦИИ ===== */
 
-    /* Новые стили для профиля и редактора аватара */
     .profile-close-btn { position: absolute; top: 20px; right: 20px; font-size: 2em; color: #2d5a48; background: none; border: none; cursor: pointer; }
     .avatar-editor { display: none; margin-top: 15px; background: #f0f8f4; padding: 20px; border-radius: 10px; border: 1px solid #cde5db; }
     .avatar-editor.active { display: block; }
-    .avatar-preview-container { 
-        width: 150px; 
-        height: 150px; 
-        border-radius: 50%; 
-        overflow: hidden; 
-        position: relative; 
-        margin: 0 auto; 
-        border: 3px solid var(--primary); 
-        cursor: grab;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f0f0f0;
-    }
+    .avatar-preview-container { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; position: relative; margin: 0 auto; border: 3px solid var(--primary); cursor: grab; display: flex; align-items: center; justify-content: center; background: #f0f0f0; }
     .avatar-preview-container:active { cursor: grabbing; }
-    .avatar-preview-img { 
-        width: 100%; 
-        height: 100%; 
-        object-fit: contain; 
-        transform-origin: center center; 
-        transition: none; 
-    }
+    .avatar-preview-img { width: 100%; height: 100%; object-fit: contain; transform-origin: center center; transition: none; }
     .avatar-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; }
     .avatar-controls button { background: var(--primary); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1.2em; cursor: pointer; }
     .avatar-controls button:hover { background: var(--primary-dark); }
@@ -443,6 +346,28 @@ def init_db():
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
         ''')
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS chat_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender_id INTEGER NOT NULL,
+                receiver_id INTEGER NOT NULL,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (sender_id) REFERENCES users (id),
+                FOREIGN KEY (receiver_id) REFERENCES users (id)
+            )
+        ''')
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender_id INTEGER NOT NULL,
+                receiver_id INTEGER NOT NULL,
+                text TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (sender_id) REFERENCES users (id),
+                FOREIGN KEY (receiver_id) REFERENCES users (id)
+            )
+        ''')
         columns = [row[1] for row in db.execute('PRAGMA table_info(users)').fetchall()]
         if 'email' not in columns:
             db.execute('ALTER TABLE users ADD COLUMN email TEXT')
@@ -456,6 +381,13 @@ def init_db():
             db.execute('ALTER TABLE users ADD COLUMN avatar_offset_x REAL DEFAULT 0.0')
         if 'avatar_offset_y' not in columns:
             db.execute('ALTER TABLE users ADD COLUMN avatar_offset_y REAL DEFAULT 0.0')
+        if 'public_id' not in columns:
+            db.execute('ALTER TABLE users ADD COLUMN public_id TEXT')
+            # Заполняем для существующих
+            users = db.execute('SELECT id FROM users').fetchall()
+            for user in users:
+                pub_id = uuid.uuid4().hex[:8].upper()
+                db.execute('UPDATE users SET public_id = ? WHERE id = ?', (pub_id, user['id']))
         db.commit()
     cleanup_invalid_users()
 
@@ -584,7 +516,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        email = request.form.get('email', '').strip()  # email необязателен
+        email = request.form.get('email', '').strip()
         role = 'user'
         theme = 'green'
         if not is_valid_username(username) or not is_valid_password(password):
@@ -597,7 +529,6 @@ def register():
                     </div>
                 </div>
             ''')
-        # Валидация email только если он введён
         if email and not is_valid_email(email):
             return render_with_bubbles('''
                 <div class="container">
@@ -620,7 +551,6 @@ def register():
                         </div>
                     </div>
                 ''')
-            # Проверка уникальности email только если он указан
             if email:
                 email_exists = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
                 if email_exists:
@@ -634,8 +564,9 @@ def register():
                         </div>
                     ''')
             email_value = email if email else None
-            cursor = db.execute('INSERT INTO users (username, password, email, role, theme) VALUES (?, ?, ?, ?, ?)',
-                               (username, password, email_value, role, theme))
+            public_id = uuid.uuid4().hex[:8].upper()
+            cursor = db.execute('INSERT INTO users (username, password, email, role, theme, public_id) VALUES (?, ?, ?, ?, ?, ?)',
+                               (username, password, email_value, role, theme, public_id))
             db.commit()
             user_id = cursor.lastrowid
         session['user_id'] = user_id
@@ -883,6 +814,153 @@ def logout():
         </div>
     ''')
 
+# ===== ЧАТ МАРШРУТЫ =====
+@app.route('/search_user_by_public_id', methods=['POST'])
+@login_required
+def search_user_by_public_id():
+    public_id = request.form.get('public_id', '').strip()
+    if not public_id:
+        return jsonify({'status': 'error', 'message': 'Введите ID'}), 400
+    with get_db() as db:
+        user = db.execute('SELECT id, username, public_id FROM users WHERE public_id = ?', (public_id,)).fetchone()
+        if not user:
+            return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
+        if user['id'] == session['user_id']:
+            return jsonify({'status': 'error', 'message': 'Это вы'}), 400
+        # Проверяем, есть ли уже заявка или дружба
+        existing = db.execute('''
+            SELECT * FROM chat_requests 
+            WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
+        ''', (session['user_id'], user['id'], user['id'], session['user_id'])).fetchone()
+        if existing:
+            if existing['status'] == 'pending':
+                return jsonify({'status': 'error', 'message': 'Заявка уже отправлена'}), 400
+            elif existing['status'] == 'accepted':
+                return jsonify({'status': 'error', 'message': 'Вы уже друзья'}), 400
+        return jsonify({'status': 'ok', 'user': {'id': user['id'], 'username': user['username'], 'public_id': user['public_id']}})
+
+@app.route('/send_friend_request', methods=['POST'])
+@login_required
+def send_friend_request():
+    receiver_id = request.form.get('receiver_id', type=int)
+    if not receiver_id:
+        return jsonify({'status': 'error', 'message': 'Не указан получатель'}), 400
+    if receiver_id == session['user_id']:
+        return jsonify({'status': 'error', 'message': 'Нельзя отправить самому себе'}), 400
+    with get_db() as db:
+        receiver = db.execute('SELECT id FROM users WHERE id = ?', (receiver_id,)).fetchone()
+        if not receiver:
+            return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
+        # Проверка дубликатов
+        existing = db.execute('''
+            SELECT * FROM chat_requests 
+            WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
+        ''', (session['user_id'], receiver_id, receiver_id, session['user_id'])).fetchone()
+        if existing:
+            if existing['status'] == 'pending':
+                return jsonify({'status': 'error', 'message': 'Заявка уже отправлена'}), 400
+            elif existing['status'] == 'accepted':
+                return jsonify({'status': 'error', 'message': 'Вы уже друзья'}), 400
+            elif existing['status'] == 'declined':
+                # Можно разрешить повторную отправку после decline, обновив существующую
+                db.execute('UPDATE chat_requests SET status = "pending", created_at = CURRENT_TIMESTAMP WHERE id = ?', (existing['id'],))
+                db.commit()
+                return jsonify({'status': 'ok', 'message': 'Заявка отправлена повторно'})
+        else:
+            db.execute('INSERT INTO chat_requests (sender_id, receiver_id) VALUES (?, ?)',
+                       (session['user_id'], receiver_id))
+            db.commit()
+        return jsonify({'status': 'ok', 'message': 'Заявка отправлена'})
+
+@app.route('/handle_friend_request', methods=['POST'])
+@login_required
+def handle_friend_request():
+    request_id = request.form.get('request_id', type=int)
+    action = request.form.get('action')  # 'accept' или 'decline'
+    if action not in ['accept', 'decline']:
+        return jsonify({'status': 'error', 'message': 'Неверное действие'}), 400
+    with get_db() as db:
+        req = db.execute('SELECT * FROM chat_requests WHERE id = ? AND receiver_id = ?',
+                         (request_id, session['user_id'])).fetchone()
+        if not req:
+            return jsonify({'status': 'error', 'message': 'Заявка не найдена'}), 404
+        if req['status'] != 'pending':
+            return jsonify({'status': 'error', 'message': 'Заявка уже обработана'}), 400
+        new_status = 'accepted' if action == 'accept' else 'declined'
+        db.execute('UPDATE chat_requests SET status = ? WHERE id = ?', (new_status, request_id))
+        db.commit()
+        return jsonify({'status': 'ok', 'new_status': new_status})
+
+@app.route('/get_pending_requests')
+@login_required
+def get_pending_requests():
+    with get_db() as db:
+        requests = db.execute('''
+            SELECT chat_requests.id, chat_requests.sender_id, users.username, users.public_id
+            FROM chat_requests
+            JOIN users ON chat_requests.sender_id = users.id
+            WHERE chat_requests.receiver_id = ? AND chat_requests.status = 'pending'
+        ''', (session['user_id'],)).fetchall()
+    return jsonify({'status': 'ok', 'requests': [dict(r) for r in requests]})
+
+@app.route('/get_friends')
+@login_required
+def get_friends():
+    with get_db() as db:
+        friends = db.execute('''
+            SELECT users.id, users.username, users.public_id
+            FROM chat_requests
+            JOIN users ON 
+                (chat_requests.sender_id = users.id AND chat_requests.receiver_id = ?)
+                OR (chat_requests.receiver_id = users.id AND chat_requests.sender_id = ?)
+            WHERE chat_requests.status = 'accepted' AND users.id != ?
+        ''', (session['user_id'], session['user_id'], session['user_id'])).fetchall()
+    return jsonify({'status': 'ok', 'friends': [dict(f) for f in friends]})
+
+@app.route('/send_message', methods=['POST'])
+@login_required
+def send_message():
+    receiver_id = request.form.get('receiver_id', type=int)
+    text = request.form.get('text', '').strip()
+    if not receiver_id or not text:
+        return jsonify({'status': 'error', 'message': 'Нет данных'}), 400
+    # Проверяем, что есть accepted заявка
+    with get_db() as db:
+        friendship = db.execute('''
+            SELECT * FROM chat_requests
+            WHERE status = 'accepted' AND (
+                (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
+            )
+        ''', (session['user_id'], receiver_id, receiver_id, session['user_id'])).fetchone()
+        if not friendship:
+            return jsonify({'status': 'error', 'message': 'Вы не друзья'}), 403
+        db.execute('INSERT INTO messages (sender_id, receiver_id, text) VALUES (?, ?, ?)',
+                   (session['user_id'], receiver_id, text))
+        db.commit()
+    return jsonify({'status': 'ok'})
+
+@app.route('/get_messages/<int:other_user_id>')
+@login_required
+def get_messages(other_user_id):
+    with get_db() as db:
+        # Проверяем дружбу
+        friendship = db.execute('''
+            SELECT * FROM chat_requests
+            WHERE status = 'accepted' AND (
+                (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
+            )
+        ''', (session['user_id'], other_user_id, other_user_id, session['user_id'])).fetchone()
+        if not friendship:
+            return jsonify({'status': 'error', 'message': 'Вы не друзья'}), 403
+        messages = db.execute('''
+            SELECT * FROM messages
+            WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
+            ORDER BY created_at ASC
+        ''', (session['user_id'], other_user_id, other_user_id, session['user_id'])).fetchall()
+    return jsonify({'status': 'ok', 'messages': [dict(m) for m in messages]})
+
+# ===== КОНЕЦ ЧАТ МАРШРУТОВ =====
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -890,11 +968,11 @@ def dashboard():
     role = session['role']
     user_id = session['user_id']
     with get_db() as db:
-        # Получаем параметры аватара текущего пользователя
-        user = db.execute('SELECT avatar_scale, avatar_offset_x, avatar_offset_y FROM users WHERE id = ?', (user_id,)).fetchone()
+        user = db.execute('SELECT avatar_scale, avatar_offset_x, avatar_offset_y, public_id FROM users WHERE id = ?', (user_id,)).fetchone()
         avatar_scale = user['avatar_scale'] if user and 'avatar_scale' in user.keys() else 1.0
         avatar_offset_x = user['avatar_offset_x'] if user and 'avatar_offset_x' in user.keys() else 0.0
         avatar_offset_y = user['avatar_offset_y'] if user and 'avatar_offset_y' in user.keys() else 0.0
+        public_id = user['public_id'] if user else ''
 
         public_files = db.execute('''
             SELECT files.*, users.username 
@@ -909,8 +987,9 @@ def dashboard():
                 WHERE files.is_public = 0 ORDER BY files.uploaded_at DESC
             ''').fetchall()
     
+    # Подготовка данных для чата (друзья, заявки) - можно через JS, но здесь передадим начальные
     if role != 'admin':
-        return render_with_bubbles('''
+        main_content = '''
             <div class="container">
                 <div class="header">
                     <h1>Доступные файлы</h1>
@@ -950,86 +1029,111 @@ def dashboard():
                 <p>Пока нет файлов.</p>
                 {% endif %}
             </div>
-            <script>
-                function toggleSettingsMenu() {
-                    document.getElementById('settingsMenu').classList.toggle('show');
-                }
-                window.onclick = function(event) {
-                    if (!event.target.matches('.settings-gear')) {
-                        var menus = document.getElementsByClassName('settings-menu');
-                        for (var i = 0; i < menus.length; i++) menus[i].classList.remove('show');
-                    }
-                }
-            </script>
-        ''', public_files=public_files, username=username,
-           avatar_scale=avatar_scale, avatar_offset_x=avatar_offset_x, avatar_offset_y=avatar_offset_y)
-    
-    return render_with_bubbles('''
-        <div class="container">
-            <div class="header">
-                <h1>Панель администратора</h1>
-                <div class="user-info">
-                    <a href="/profile">
-                        {% if avatar_url %}
-                            <div class="avatar">
-                                <img src="/avatar/{{ session['user_id'] }}" style="transform: translate(-50%, -50%) scale({{ avatar_scale }}) translate({{ avatar_offset_x }}px, {{ avatar_offset_y }}px);">
-                            </div>
-                        {% else %}
-                            <div class="avatar">{{ username[0]|upper }}</div>
-                        {% endif %}
-                    </a>
-                    <span class="role-badge">Администратор: {{ username }}</span>
-                    <button class="settings-gear" onclick="toggleSettingsMenu()">⚙️</button>
-                    <div class="settings-menu" id="settingsMenu">
-                        <a href="/profile">Профиль</a>
-                        <a href="/admin/users">Участники</a>
-                    </div>
-                    <a href="/logout" class="btn btn-secondary btn-sm">Выйти</a>
-                </div>
-            </div>
-            <div class="admin-dashboard">
-                <div class="panel">
-                    <div class="panel-title">
-                        <span>Общедоступные файлы</span>
-                        <a href="/upload?visibility=public" class="btn btn-primary btn-sm">Загрузить</a>
-                    </div>
-                    <div class="file-list">
-                        {% for file in public_files %}
-                        <div class="file-item">
-                            <div class="file-info">
-                                <div class="file-name">📄 {{ file.original_name }}</div>
-                                <div class="file-meta">Загрузил: {{ file.username }}</div>
-                            </div>
-                            <div class="file-actions">
-                                <a href="/download/{{ file.id }}" class="btn btn-success btn-sm">⬇️</a>
-                                <a href="/rename/{{ file.id }}" class="btn btn-secondary btn-sm">✏️</a>
-                                <a href="/delete/{{ file.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить файл?')">🗑️</a>
-                            </div>
+        '''
+    else:
+        main_content = '''
+            <div class="container">
+                <div class="header">
+                    <h1>Панель администратора</h1>
+                    <div class="user-info">
+                        <a href="/profile">
+                            {% if avatar_url %}
+                                <div class="avatar">
+                                    <img src="/avatar/{{ session['user_id'] }}" style="transform: translate(-50%, -50%) scale({{ avatar_scale }}) translate({{ avatar_offset_x }}px, {{ avatar_offset_y }}px);">
+                                </div>
+                            {% else %}
+                                <div class="avatar">{{ username[0]|upper }}</div>
+                            {% endif %}
+                        </a>
+                        <span class="role-badge">Администратор: {{ username }}</span>
+                        <button class="settings-gear" onclick="toggleSettingsMenu()">⚙️</button>
+                        <div class="settings-menu" id="settingsMenu">
+                            <a href="/profile">Профиль</a>
+                            <a href="/admin/users">Участники</a>
                         </div>
-                        {% endfor %}
+                        <a href="/logout" class="btn btn-secondary btn-sm">Выйти</a>
                     </div>
                 </div>
-                <div class="panel">
-                    <div class="panel-title">
-                        <span>Приватные файлы</span>
-                        <a href="/upload?visibility=private" class="btn btn-primary btn-sm">Загрузить</a>
-                    </div>
-                    <div class="file-list">
-                        {% for file in private_files %}
-                        <div class="file-item">
-                            <div class="file-info">
-                                <div class="file-name">📄 {{ file.original_name }}</div>
-                                <div class="file-meta">Загрузил: {{ file.username }}</div>
-                            </div>
-                            <div class="file-actions">
-                                <a href="/download/{{ file.id }}" class="btn btn-success btn-sm">⬇️</a>
-                                <a href="/delete/{{ file.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить файл?')">🗑️</a>
-                            </div>
+                <div class="admin-dashboard">
+                    <div class="panel">
+                        <div class="panel-title">
+                            <span>Общедоступные файлы</span>
+                            <a href="/upload?visibility=public" class="btn btn-primary btn-sm">Загрузить</a>
                         </div>
-                        {% endfor %}
+                        <div class="file-list">
+                            {% for file in public_files %}
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-name">📄 {{ file.original_name }}</div>
+                                    <div class="file-meta">Загрузил: {{ file.username }}</div>
+                                </div>
+                                <div class="file-actions">
+                                    <a href="/download/{{ file.id }}" class="btn btn-success btn-sm">⬇️</a>
+                                    <a href="/rename/{{ file.id }}" class="btn btn-secondary btn-sm">✏️</a>
+                                    <a href="/delete/{{ file.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить файл?')">🗑️</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-title">
+                            <span>Приватные файлы</span>
+                            <a href="/upload?visibility=private" class="btn btn-primary btn-sm">Загрузить</a>
+                        </div>
+                        <div class="file-list">
+                            {% for file in private_files %}
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <div class="file-name">📄 {{ file.original_name }}</div>
+                                    <div class="file-meta">Загрузил: {{ file.username }}</div>
+                                </div>
+                                <div class="file-actions">
+                                    <a href="/download/{{ file.id }}" class="btn btn-success btn-sm">⬇️</a>
+                                    <a href="/delete/{{ file.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить файл?')">🗑️</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
+        '''
+
+    chat_sidebar = '''
+        <div class="chat-sidebar">
+            <h3>Чат</h3>
+            <div class="chat-search">
+                <input type="text" id="chat-public-id-input" placeholder="Введите ID пользователя">
+                <button class="btn btn-primary btn-sm" onclick="searchUserByPublicId()">Найти</button>
+            </div>
+            <div id="search-result"></div>
+            <div class="chat-sections">
+                <div class="chat-section">
+                    <h4>Заявки <span id="pending-count" style="color: red;"></span></h4>
+                    <div id="pending-requests"></div>
+                </div>
+                <div class="chat-section">
+                    <h4>Друзья</h4>
+                    <div id="friends-list"></div>
+                </div>
+            </div>
+            <div class="chat-window" id="chat-window">
+                <div class="messages" id="chat-messages"></div>
+                <div class="msg-input">
+                    <input type="text" id="message-text" placeholder="Сообщение...">
+                    <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+                </div>
+            </div>
+        </div>
+    '''
+
+    full_template = '''
+        <div class="chat-layout">
+            <div style="flex: 1;">
+                ''' + main_content + '''
+            </div>
+            ''' + chat_sidebar + '''
         </div>
         <script>
             function toggleSettingsMenu() {
@@ -1041,9 +1145,152 @@ def dashboard():
                     for (var i = 0; i < menus.length; i++) menus[i].classList.remove('show');
                 }
             }
+
+            // ===== ЧАТ JS =====
+            let currentChatUserId = null;
+
+            async function searchUserByPublicId() {
+                const publicId = document.getElementById('chat-public-id-input').value.trim();
+                if (!publicId) return alert('Введите ID');
+                const formData = new FormData();
+                formData.append('public_id', publicId);
+                const resp = await fetch('/search_user_by_public_id', { method: 'POST', body: formData });
+                const data = await resp.json();
+                const resultDiv = document.getElementById('search-result');
+                if (data.status === 'ok') {
+                    resultDiv.innerHTML = `
+                        <div class="chat-item">
+                            <span class="username">${data.user.username} (ID: ${data.user.public_id})</span>
+                            <button class="btn btn-primary btn-sm" onclick="sendFriendRequest(${data.user.id})">Отправить заявку</button>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">${data.message}</p>`;
+                }
+            }
+
+            async function sendFriendRequest(receiverId) {
+                const formData = new FormData();
+                formData.append('receiver_id', receiverId);
+                const resp = await fetch('/send_friend_request', { method: 'POST', body: formData });
+                const data = await resp.json();
+                alert(data.message);
+                document.getElementById('search-result').innerHTML = '';
+                document.getElementById('chat-public-id-input').value = '';
+                loadPendingRequests();
+            }
+
+            async function loadPendingRequests() {
+                const resp = await fetch('/get_pending_requests');
+                const data = await resp.json();
+                const container = document.getElementById('pending-requests');
+                container.innerHTML = '';
+                if (data.requests.length === 0) {
+                    container.innerHTML = '<p>Нет заявок</p>';
+                }
+                data.requests.forEach(req => {
+                    const div = document.createElement('div');
+                    div.className = 'chat-item';
+                    div.innerHTML = `
+                        <span class="username">${req.username} (ID: ${req.public_id})</span>
+                        <div class="request-actions">
+                            <button class="btn btn-success btn-sm" onclick="handleRequest(${req.id}, 'accept')">✓</button>
+                            <button class="btn btn-danger btn-sm" onclick="handleRequest(${req.id}, 'decline')">✗</button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                document.getElementById('pending-count').textContent = data.requests.length > 0 ? `(${data.requests.length})` : '';
+            }
+
+            async function handleRequest(requestId, action) {
+                const formData = new FormData();
+                formData.append('request_id', requestId);
+                formData.append('action', action);
+                const resp = await fetch('/handle_friend_request', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    loadPendingRequests();
+                    loadFriends();
+                } else {
+                    alert(data.message);
+                }
+            }
+
+            async function loadFriends() {
+                const resp = await fetch('/get_friends');
+                const data = await resp.json();
+                const container = document.getElementById('friends-list');
+                container.innerHTML = '';
+                if (data.friends.length === 0) {
+                    container.innerHTML = '<p>Нет друзей</p>';
+                }
+                data.friends.forEach(friend => {
+                    const div = document.createElement('div');
+                    div.className = 'chat-item';
+                    div.innerHTML = `<span class="username">${friend.username}</span>`;
+                    div.onclick = () => openChat(friend.id, friend.username);
+                    container.appendChild(div);
+                });
+            }
+
+            function openChat(userId, username) {
+                currentChatUserId = userId;
+                document.getElementById('chat-window').classList.add('active');
+                document.getElementById('chat-messages').innerHTML = `<p>Чат с ${username}</p>`;
+                loadMessages();
+            }
+
+            async function loadMessages() {
+                if (!currentChatUserId) return;
+                const resp = await fetch(`/get_messages/${currentChatUserId}`);
+                const data = await resp.json();
+                if (data.status !== 'ok') {
+                    alert(data.message);
+                    return;
+                }
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = '';
+                data.messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `msg ${msg.sender_id === {{ session['user_id'] }} ? 'sent' : 'received'}`;
+                    div.textContent = msg.text;
+                    container.appendChild(div);
+                });
+            }
+
+            async function sendMessage() {
+                if (!currentChatUserId) return;
+                const text = document.getElementById('message-text').value.trim();
+                if (!text) return;
+                const formData = new FormData();
+                formData.append('receiver_id', currentChatUserId);
+                formData.append('text', text);
+                const resp = await fetch('/send_message', { method: 'POST', body: formData });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    document.getElementById('message-text').value = '';
+                    loadMessages();
+                } else {
+                    alert(data.message);
+                }
+            }
+
+            // Инициализация
+            loadPendingRequests();
+            loadFriends();
+            // Периодическое обновление заявок и сообщений
+            setInterval(() => {
+                loadPendingRequests();
+                if (currentChatUserId) loadMessages();
+            }, 5000);
         </script>
-    ''', username=username, public_files=public_files, private_files=private_files,
-       avatar_scale=avatar_scale, avatar_offset_x=avatar_offset_x, avatar_offset_y=avatar_offset_y)
+    '''
+
+    return render_with_bubbles(full_template, public_files=public_files, private_files=private_files,
+                               username=username, role=role, avatar_scale=avatar_scale,
+                               avatar_offset_x=avatar_offset_x, avatar_offset_y=avatar_offset_y,
+                               public_id=public_id)
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -1084,7 +1331,6 @@ def profile():
         session['username'] = new_username
         return jsonify({'status': 'ok'})
     
-    # Безопасно извлекаем параметры аватара
     avatar_scale = user['avatar_scale'] if 'avatar_scale' in user.keys() else 1.0
     avatar_offset_x = user['avatar_offset_x'] if 'avatar_offset_x' in user.keys() else 0.0
     avatar_offset_y = user['avatar_offset_y'] if 'avatar_offset_y' in user.keys() else 0.0
@@ -1107,6 +1353,14 @@ def profile():
                     </div>
                 </div>
                 <div class="profile-main">
+                    <div class="form-group">
+                        <label>Ваш личный ID:</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" value="{{ user.public_id }}" id="public-id-input" readonly style="flex: 1;">
+                            <button class="btn btn-secondary btn-sm" onclick="copyPublicId()">Копировать</button>
+                        </div>
+                        <small>Передайте этот ID друзьям, чтобы они могли найти вас для чата.</small>
+                    </div>
                     <form id="profile-form" method="post">
                         <div class="form-group">
                             <label>Никнейм:</label>
@@ -1137,7 +1391,7 @@ def profile():
                         <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('avatar-input').click();">Выбрать файл</button>
                     </div>
 
-                    <!-- Редактор аватара (появляется после выбора файла) -->
+                    <!-- Редактор аватара -->
                     <div class="avatar-editor" id="avatar-editor">
                         <div class="avatar-preview-container" id="avatar-preview-container">
                             <img id="avatar-editor-img" class="avatar-preview-img" src="" alt="Предпросмотр">
@@ -1156,10 +1410,17 @@ def profile():
             </div>
         </div>
         <script>
+            function copyPublicId() {
+                var copyText = document.getElementById('public-id-input');
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                document.execCommand('copy');
+                alert('ID скопирован: ' + copyText.value);
+            }
+
             // ===== Мгновенное сохранение темы и ника (и email) =====
             function setTheme(theme) {
                 document.body.dataset.theme = theme;
-                // Сохраняем тему
                 fetch('/profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1171,7 +1432,6 @@ def profile():
                 }).then(r => r.json()).then(data => {
                     if (data.status !== 'ok') console.error('Ошибка сохранения темы');
                 });
-                // Обновляем визуальное выделение
                 var radios = document.getElementsByName('theme');
                 for (var i = 0; i < radios.length; i++) {
                     radios[i].checked = (radios[i].value === theme);
@@ -1183,7 +1443,6 @@ def profile():
                 }
             }
 
-            // Автосохранение ника и email при потере фокуса или Enter
             document.getElementById('username-input').addEventListener('change', function() {
                 saveUsernameAndTheme();
             });
@@ -1217,7 +1476,6 @@ def profile():
                     })
                 }).then(r => r.json()).then(data => {
                     if (data.status === 'ok') {
-                        // Обновляем аватар-заглушку, если имя изменилось
                         var preview = document.getElementById('avatar-preview');
                         if (preview.tagName === 'DIV' && username.length > 0) {
                             preview.textContent = username[0].toUpperCase();
@@ -1247,7 +1505,6 @@ def profile():
             let isDragging = false;
             let startX, startY;
 
-            // Загрузка файла
             avatarInput.addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -1255,7 +1512,6 @@ def profile():
                 reader.onload = function(ev) {
                     avatarEditorImg.src = ev.target.result;
                     avatarEditor.classList.add('active');
-                    // Сброс параметров
                     currentScale = 1.0;
                     offsetX = 0;
                     offsetY = 0;
@@ -1267,13 +1523,11 @@ def profile():
             function updateTransform() {
                 avatarEditorImg.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
                 zoomValueSpan.textContent = Math.round(currentScale * 100) + '%';
-                // Обновляем скрытые поля
                 hiddenScale.value = currentScale;
                 hiddenOffsetX.value = offsetX;
                 hiddenOffsetY.value = offsetY;
             }
 
-            // Масштабирование кнопками
             zoomInBtn.addEventListener('click', function() {
                 currentScale = Math.min(3.0, currentScale + 0.1);
                 updateTransform();
@@ -1283,7 +1537,6 @@ def profile():
                 updateTransform();
             });
 
-            // Масштабирование колесом мыши
             avatarPreviewContainer.addEventListener('wheel', function(e) {
                 e.preventDefault();
                 const delta = e.deltaY > 0 ? -0.1 : 0.1;
@@ -1291,7 +1544,6 @@ def profile():
                 updateTransform();
             });
 
-            // Перетаскивание мышью
             avatarPreviewContainer.addEventListener('mousedown', function(e) {
                 isDragging = true;
                 startX = e.clientX - offsetX;
@@ -1309,7 +1561,6 @@ def profile():
                 avatarPreviewContainer.style.cursor = 'grab';
             });
 
-            // Перетаскивание пальцем (touch)
             avatarPreviewContainer.addEventListener('touchstart', function(e) {
                 e.preventDefault();
                 const touch = e.touches[0];
@@ -1333,7 +1584,6 @@ def profile():
                 avatarPreviewContainer.style.cursor = 'grab';
             });
 
-            // Сохранение аватара
             saveAvatarBtn.addEventListener('click', function() {
                 const formData = new FormData();
                 formData.append('avatar', avatarInput.files[0]);
@@ -1348,13 +1598,11 @@ def profile():
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'ok') {
-                        // Обновляем аватар в интерфейсе
                         const preview = document.getElementById('avatar-preview');
                         if (preview.tagName === 'IMG') {
                             preview.src = '/avatar/' + data.user_id + '?t=' + new Date().getTime();
                             preview.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
                         } else {
-                            // Заменяем div на img
                             const img = document.createElement('img');
                             img.id = 'avatar-preview';
                             img.src = '/avatar/' + data.user_id + '?t=' + new Date().getTime();
@@ -1364,9 +1612,8 @@ def profile():
                             img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
                             preview.parentNode.replaceChild(img, preview);
                         }
-                        // Закрываем редактор
                         avatarEditor.classList.remove('active');
-                        avatarInput.value = ''; // очищаем input
+                        avatarInput.value = '';
                     } else {
                         alert('Ошибка сохранения аватара');
                     }
@@ -1380,7 +1627,6 @@ def profile():
     ''', user=user, themes=themes, theme=user['theme'], avatar_url=user['avatar'],
        avatar_scale=avatar_scale, avatar_offset_x=avatar_offset_x, avatar_offset_y=avatar_offset_y)
 
-# Новый маршрут для обновления аватара
 @app.route('/update_avatar', methods=['POST'])
 @login_required
 def update_avatar():
@@ -1399,7 +1645,7 @@ def update_avatar():
     scale = float(request.form.get('avatar_scale', 1.0))
     offset_x = float(request.form.get('avatar_offset_x', 0.0))
     offset_y = float(request.form.get('avatar_offset_y', 0.0))
-    scale = max(0.5, min(3.0, scale))  # ограничение
+    scale = max(0.5, min(3.0, scale))
     with get_db() as db:
         db.execute('UPDATE users SET avatar=?, avatar_scale=?, avatar_offset_x=?, avatar_offset_y=? WHERE id=?',
                    (filename, scale, offset_x, offset_y, user_id))
@@ -1543,7 +1789,7 @@ def rename_file(file_id):
 @admin_required
 def admin_users():
     with get_db() as db:
-        users = db.execute('SELECT id, username, email, password, role FROM users ORDER BY id').fetchall()
+        users = db.execute('SELECT id, username, email, password, role, public_id FROM users ORDER BY id').fetchall()
     return render_with_bubbles('''
         <div class="container">
             <div class="header">
@@ -1551,13 +1797,14 @@ def admin_users():
                 <a href="/dashboard" class="btn btn-secondary btn-sm">Назад</a>
             </div>
             <table class="user-table">
-                <thead><tr><th>ID</th><th>Логин</th><th>Эл. почта</th><th>Пароль</th><th>Роль</th><th>Действия</th></tr></thead>
+                <thead><tr><th>ID</th><th>Логин</th><th>Эл. почта</th><th>Пароль</th><th>Роль</th><th>Public ID</th><th>Действия</th></tr></thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
                         <td>{{ user.id }}</td><td>{{ user.username }}</td><td>{{ user.email or '—' }}</td>
                         <td>{{ user.password }}</td>
                         <td>{% if user.role == 'admin' %}Администратор{% else %}Пользователь{% endif %}</td>
+                        <td>{{ user.public_id }}</td>
                         <td>
                             <a href="/admin/edit_user/{{ user.id }}" class="btn btn-secondary btn-sm">✏️</a>
                             <a href="/admin/delete_user/{{ user.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить участника?')">🗑️</a>
@@ -1629,6 +1876,9 @@ def delete_user(user_id):
                 except:
                     pass
         db.execute('DELETE FROM files WHERE user_id = ?', (user_id,))
+        # Удаляем сообщения и заявки, связанные с пользователем
+        db.execute('DELETE FROM messages WHERE sender_id = ? OR receiver_id = ?', (user_id, user_id))
+        db.execute('DELETE FROM chat_requests WHERE sender_id = ? OR receiver_id = ?', (user_id, user_id))
         db.execute('DELETE FROM users WHERE id = ?', (user_id,))
         db.commit()
     return redirect(url_for('admin_users'))
